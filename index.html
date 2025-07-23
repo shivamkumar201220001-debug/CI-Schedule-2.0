@@ -1,21 +1,55 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Teacher Schedule</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      background-color: #f9f9f9;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    #result ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    #result li {
+      background-color: #fff;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    #result p {
+      color: red;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Teacher Schedule Viewer</h1>
-    <select id="teacherSelect">
-      <option value="">Select a teacher</option>
-    </select>
-    <button onclick="loadSchedule()">View Schedule</button>
-    <div id="scheduleOutput"></div>
-  </div>
+  <h1>Teacher Schedule</h1>
+  <input type="text" id="searchBox" placeholder="🔍 Search by name (e.g., Shivam)" />
+  <div id="result"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
