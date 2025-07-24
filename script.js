@@ -1,7 +1,7 @@
 
-const sheetId = "1_DUat3nJc85u1dEC2LhXh-hu55x66ke7WRtiA8nHQpY";
+const sheetId = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
 const sheetName = "CI time";
-const apiKey = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
+const apiKey = "AIzaSyBCn-QeQAIMCw2FbC-knJJ3zn3_SI3KDhs";
 
 const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`;
 
