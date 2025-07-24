@@ -16,10 +16,10 @@ document.getElementById("searchBox").addEventListener("input", function () {
   const result = document.getElementById("result");
   result.innerHTML = "";
 
-  if (!search) return;
+  if (!search || sheetData.length === 0) return;
 
   const headers = sheetData[0];
-  const matches = sheetData.slice(1).filter(row => row[0].toLowerCase().includes(search));
+  const matches = sheetData.slice(1).filter(row => row[0]?.toLowerCase().includes(search));
 
   if (matches.length === 0) {
     result.innerHTML = "<p>No schedule found.</p>";
