@@ -1,28 +1,48 @@
+const sheetId = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
+const apiKey = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
+const sheetName = "CI time";
 
-body {
-  font-family: Arial, sans-serif;
-  background: #f0f4f8;
-  margin: 0;
-  padding: 20px;
-}
-.container {
-  max-width: 500px;
-  margin: auto;
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-select, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  font-size: 16px;
-}
-#scheduleOutput {
-  margin-top: 20px;
+async function getSchedule() {
+  const name = document.getElementById("nameInput").value.trim().toLowerCase();
+  const outputDiv = document.getElementById("scheduleOutput");
+  outputDiv.innerHTML = "Loading...";
+
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    const rows = data.values;
+
+    if (!rows || rows.length === 0) {
+      outputDiv.innerHTML = "<p>No data found in sheet.</p>";
+      return;
+    }
+
+    const headers = rows[0];
+    const matchedRow = rows.find(
+      (row, index) => index > 0 && row[0]?.toLowerCase() === name
+    );
+
+    if (!matchedRow) {
+      outputDiv.innerHTML = "<p>No schedule found. Please check your name.</p>";
+      return;
+    }
+
+    let tableHtml = "<table border='1'><tr>";
+    headers.forEach((header) => {
+      tableHtml += `<th>${header}</th>`;
+    });
+    tableHtml += "</tr><tr>";
+    matchedRow.forEach((cell) => {
+      tableHtml += `<td>${cell}</td>`;
+    });
+    tableHtml += "</tr></table>";
+
+    outputDiv.innerHTML = tableHtml;
+  } catch (error) {
+    console.error("Error fetching schedule:", error);
+    outputDiv.innerHTML =
+      "<p>Error loading schedule. Please try again later.</p>";
+  }
 }
