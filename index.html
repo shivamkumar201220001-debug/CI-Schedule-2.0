@@ -1,55 +1,68 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Teacher Schedule</title>
+  <title>CI Teacher Schedule</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-      background-color: #f9f9f9;
-    }
-
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    #result ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    #result li {
-      background-color: #fff;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-
-    #result p {
-      color: red;
-    }
+    body { font-family: Arial; padding: 20px; background: #f1f1f1; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
+    input, button { padding: 10px; margin: 10px 0; width: 100%; font-size: 16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background: #f0f0f0; }
+    .not-found { color: red; margin-top: 20px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>Teacher Schedule</h1>
-  <input type="text" id="searchBox" placeholder="🔍 Search by name (e.g., CI)" />
-  <div id="result"></div>
+  <div class="container">
+    <h2>Check Your CI Schedule</h2>
+    <input type="text" id="teacherName" placeholder="Enter your name (e.g., Rahul)" />
+    <button onclick="fetchSchedule()">View Schedule</button>
+    <div id="result"></div>
+  </div>
 
-  <script src="script.js"></script>
+  <script>
+    const apiKey = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
+    const sheetId = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
+    const sheetName = "CI time";
+
+    async function fetchSchedule() {
+      const name = document.getElementById("teacherName").value.trim().toLowerCase();
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "Loading...";
+
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const rows = data.values;
+
+        if (!rows || rows.length === 0) {
+          resultDiv.innerHTML = "<p class='not-found'>No data found in sheet.</p>";
+          return;
+        }
+
+        const headers = rows[0];
+        const matched = rows.find((row, index) => index !== 0 && row[0]?.toLowerCase() === name);
+
+        if (matched) {
+          let table = "<table><tr>";
+          headers.forEach(header => table += `<th>${header}</th>`);
+          table += "</tr><tr>";
+          matched.forEach(cell => table += `<td>${cell}</td>`);
+          table += "</tr></table>";
+          resultDiv.innerHTML = table;
+        } else {
+          resultDiv.innerHTML = `<p class="not-found">Schedule not found. Please check your name.</p>`;
+        }
+
+      } catch (err) {
+        resultDiv.innerHTML = `<p class="not-found">Error fetching schedule. Try again.</p>`;
+        console.error(err);
+      }
+    }
+  </script>
 </body>
 </html>
