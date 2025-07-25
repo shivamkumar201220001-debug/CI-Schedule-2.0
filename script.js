@@ -1,48 +1,59 @@
-const sheetId = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
-const apiKey = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
-const sheetName = "CI time";
+const API_KEY = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
+const SHEET_ID = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
+const SHEET_NAME = "CI time";
 
-async function getSchedule() {
-  const name = document.getElementById("nameInput").value.trim().toLowerCase();
-  const outputDiv = document.getElementById("scheduleOutput");
-  outputDiv.innerHTML = "Loading...";
+async function loadSchedule() {
+  const inputName = document.getElementById("teacherNameInput").value.trim().toLowerCase();
+  if (!inputName) return alert("Please enter your name.");
 
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
 
   try {
-    const response = await fetch(url);
-    const data = await response.json();
+    const res = await fetch(url);
+    const data = await res.json();
     const rows = data.values;
 
-    if (!rows || rows.length === 0) {
-      outputDiv.innerHTML = "<p>No data found in sheet.</p>";
-      return;
-    }
-
     const headers = rows[0];
-    const matchedRow = rows.find(
-      (row, index) => index > 0 && row[0]?.toLowerCase() === name
-    );
+    const teacherData = rows.filter(row => row[0] && row[0].toLowerCase() === inputName);
 
-    if (!matchedRow) {
-      outputDiv.innerHTML = "<p>No schedule found. Please check your name.</p>";
+    if (teacherData.length === 0) {
+      alert("No schedule found for this name. Please check spelling.");
       return;
     }
 
-    let tableHtml = "<table border='1'><tr>";
-    headers.forEach((header) => {
-      tableHtml += `<th>${header}</th>`;
-    });
-    tableHtml += "</tr><tr>";
-    matchedRow.forEach((cell) => {
-      tableHtml += `<td>${cell}</td>`;
-    });
-    tableHtml += "</tr></table>";
-
-    outputDiv.innerHTML = tableHtml;
+    document.getElementById("teacherTitle").innerText = "Schedule for " + teacherData[0][0];
+    generateTable(headers, teacherData);
+    document.getElementById("scheduleBox").classList.remove("hidden");
   } catch (error) {
-    console.error("Error fetching schedule:", error);
-    outputDiv.innerHTML =
-      "<p>Error loading schedule. Please try again later.</p>";
+    console.error("Error:", error);
+    alert("Failed to load schedule. Try again later.");
   }
+}
+
+function generateTable(headers, data) {
+  const table = document.getElementById("scheduleTable");
+  table.innerHTML = "";
+
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  headers.forEach(header => {
+    const th = document.createElement("th");
+    th.innerText = header;
+    headRow.appendChild(th);
+  });
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  data.forEach(row => {
+    const tr = document.createElement("tr");
+    headers.forEach((_, i) => {
+      const td = document.createElement("td");
+      td.innerText = row[i] || "";
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
 }
