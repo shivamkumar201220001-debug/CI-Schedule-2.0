@@ -1,66 +1,102 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CI Teacher Schedule</title>
+  <title>Teacher Schedule Viewer</title>
   <style>
-    body { font-family: Arial; padding: 20px; background: #f1f1f1; }
-    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
-    input, button { padding: 10px; margin: 10px 0; width: 100%; font-size: 16px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-    th { background: #f0f0f0; }
-    .not-found { color: red; margin-top: 20px; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f8f8f8;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px #ccc;
+    }
+    h1 {
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .message {
+      color: red;
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Check Your CI Schedule</h2>
-    <input type="text" id="teacherName" placeholder="Enter your name (e.g., Rahul)" />
-    <button onclick="fetchSchedule()">View Schedule</button>
-    <div id="result"></div>
+    <h1>CI Teacher Schedule</h1>
+    <input type="text" id="nameInput" placeholder="Enter Your Name (e.g., Rahul)" />
+    <button onclick="getSchedule()">View My Schedule</button>
+    <div id="scheduleOutput"></div>
   </div>
 
   <script>
     const apiKey = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
     const sheetId = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
-    const sheetName = "CI Time";
+    const sheetName = "CI time";
 
-    async function fetchSchedule() {
-      const name = document.getElementById("teacherName").value.trim().toLowerCase();
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "Loading...";
+    async function getSchedule() {
+      const name = document.getElementById("nameInput").value.trim().toLowerCase();
+      const output = document.getElementById("scheduleOutput");
+      output.innerHTML = "Loading...";
 
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`;
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        const rows = data.values;
 
-        if (!rows || rows.length === 0) {
-          resultDiv.innerHTML = "<p class='not-found'>No data found in sheet.</p>";
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.values || data.values.length < 2) {
+          output.innerHTML = `<div class="message">No data found in sheet.</div>`;
           return;
         }
 
-        const headers = rows[0];
-        const matched = rows.find((row, index) => index !== 0 && row[0]?.toLowerCase() === name);
+        const headers = data.values[0];
+        const rows = data.values.slice(1);
+        const match = rows.find(row => row[0]?.toLowerCase() === name);
 
-        if (matched) {
-          let table = "<table><tr>";
-          headers.forEach(header => table += `<th>${header}</th>`);
-          table += "</tr><tr>";
-          matched.forEach(cell => table += `<td>${cell}</td>`);
-          table += "</tr></table>";
-          resultDiv.innerHTML = table;
-        } else {
-          resultDiv.innerHTML = `<p class="not-found">Schedule not found. Please check your name.</p>`;
+        if (!match) {
+          output.innerHTML = `<div class="message">Schedule not found. Please check your name.</div>`;
+          return;
         }
 
-      } catch (err) {
-        resultDiv.innerHTML = `<p class="not-found">Error fetching schedule. Try again.</p>`;
-        console.error(err);
+        let table = "<table><tr>";
+        headers.forEach(h => table += `<th>${h}</th>`);
+        table += "</tr><tr>";
+        match.forEach(cell => table += `<td>${cell}</td>`);
+        table += "</tr></table>";
+
+        output.innerHTML = table;
+
+      } catch (error) {
+        output.innerHTML = `<div class="message">Error loading schedule. Please try again later.</div>`;
+        console.error(error);
       }
     }
   </script>
