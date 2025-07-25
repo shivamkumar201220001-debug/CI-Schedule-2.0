@@ -1,4 +1,4 @@
-const API_KEY = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
+const API_KEY = "AIzaSyBCn-QeQAIMCw2FbC-knJJ3zn3_SI3KDhs";
 const SHEET_ID = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
 const SHEET_NAME = "CI time";
 
