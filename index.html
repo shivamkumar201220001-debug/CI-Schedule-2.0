@@ -3,129 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mathura Pathshala Schedule</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: white;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    h1 {
-      color: #000;
-      margin-bottom: 20px;
-    }
-
-    #searchInput {
-      padding: 10px;
-      font-size: 16px;
-      width: 80%;
-      max-width: 320px;
-      margin-bottom: 30px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 25px;
-    }
-
-    th, td {
-      border: 1px solid #888;
-      padding: 8px;
-      text-align: center;
-      font-size: 14px;
-    }
-
-    th {
-      background-color: #0077cc;
-      color: white;
-    }
-  </style>
+  <title>CI Teacher Schedule</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Mathura Pathshala Schedule</h1>
-    <input type="text" id="searchInput" placeholder="Search teacher name..." />
-    <div id="scheduleContainer"></div>
+    <h1>CI Schedule - Mathura Pathshala</h1>
+    <input type="text" id="nameInput" placeholder="Enter Your Name" />
+    <button onclick="getSchedule()">Show Schedule</button>
+    <div id="tableContainer"></div>
   </div>
 
-  <script>
-    const apiKey = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
-    const sheetId = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
-    const sheetName = "CI time";
-
-    const scheduleContainer = document.getElementById("scheduleContainer");
-    const searchInput = document.getElementById("searchInput");
-
-    fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        const rows = data.values;
-        if (!rows || rows.length === 0) {
-          scheduleContainer.innerHTML = "<p>No data found.</p>";
-          return;
-        }
-
-        const headers = rows[0];
-        const teacherRows = rows.slice(1);
-
-        function renderTable(filteredRows) {
-          scheduleContainer.innerHTML = "";
-
-          filteredRows.forEach((row) => {
-            const table = document.createElement("table");
-            const thead = document.createElement("thead");
-            const tbody = document.createElement("tbody");
-
-            const headerRow = document.createElement("tr");
-            headers.forEach((h) => {
-              const th = document.createElement("th");
-              th.textContent = h;
-              headerRow.appendChild(th);
-            });
-            thead.appendChild(headerRow);
-
-            const dataRow = document.createElement("tr");
-            headers.forEach((_, i) => {
-              const td = document.createElement("td");
-              td.textContent = row[i] || "";
-              dataRow.appendChild(td);
-            });
-            tbody.appendChild(dataRow);
-
-            table.appendChild(thead);
-            table.appendChild(tbody);
-            scheduleContainer.appendChild(table);
-          });
-        }
-
-        renderTable(teacherRows);
-
-        searchInput.addEventListener("input", () => {
-          const query = searchInput.value.toLowerCase().trim();
-          const filtered = teacherRows.filter((row) =>
-            row[0].toLowerCase().includes(query)
-          );
-          renderTable(filtered);
-        });
-      })
-      .catch((error) => {
-        scheduleContainer.innerHTML = "<p>Error loading schedule.</p>";
-        console.error("Error:", error);
-      });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
