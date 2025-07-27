@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mathura Pathshala Schedule</title>
-  <link rel="stylesheet" href="style.css"/>
+  <title>CI Teacher Schedule</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Mathura Pathshala Schedule</h1>
-    <input type="text" id="searchInput" placeholder="Search teacher name..." />
-    <div id="scheduleContainer"></div>
+    <h1>CI Schedule - Mathura Pathshala</h1>
+    <input type="text" id="nameInput" placeholder="Enter Your Name" />
+    <button onclick="getSchedule()">Show Schedule</button>
+    <div id="tableContainer"></div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
