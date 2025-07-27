@@ -1,67 +1,53 @@
-const apiKey = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
-const sheetId = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
-const sheetName = "CI time";
+const API_KEY = "AIzaSyBCn-QeQAIMCw2FbC-knJJ3zn3_SI3KDhs";
+const SHEET_ID = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
+const SHEET_NAME = "CI time";
 
-const scheduleContainer = document.getElementById("scheduleContainer");
-const searchInput = document.getElementById("searchInput");
+async function getSchedule() {
+  const name = document.getElementById("nameInput").value.trim().toLowerCase();
+  const container = document.getElementById("tableContainer");
+  container.innerHTML = "";
 
-fetch(
-  `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`
-)
-  .then((res) => res.json())
-  .then((data) => {
+  if (!name) {
+    alert("Please enter your name.");
+    return;
+  }
+
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
     const rows = data.values;
-    if (!rows || rows.length === 0) {
-      scheduleContainer.innerHTML = "<p>No data found.</p>";
+
+    const header = rows[0];
+    const match = rows.find((row, i) => i !== 0 && row[0].toLowerCase() === name);
+
+    if (!match) {
+      container.innerHTML = "<p>No schedule found for this name.</p>";
       return;
     }
 
-    const headers = rows[0];
-    const teacherRows = rows.slice(1);
+    const table = document.createElement("table");
 
-    function renderTable(filteredRows) {
-      scheduleContainer.innerHTML = "";
-
-      filteredRows.forEach((row) => {
-        const table = document.createElement("table");
-        const thead = document.createElement("thead");
-        const tbody = document.createElement("tbody");
-
-        const headerRow = document.createElement("tr");
-        headers.forEach((h) => {
-          const th = document.createElement("th");
-          th.textContent = h;
-          headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-
-        const dataRow = document.createElement("tr");
-        headers.forEach((_, i) => {
-          const td = document.createElement("td");
-          td.textContent = row[i] || "";
-          dataRow.appendChild(td);
-        });
-        tbody.appendChild(dataRow);
-
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        scheduleContainer.appendChild(table);
-      });
-    }
-
-    // Initial render
-    renderTable(teacherRows);
-
-    // Filter on input
-    searchInput.addEventListener("input", () => {
-      const query = searchInput.value.toLowerCase().trim();
-      const filtered = teacherRows.filter((row) =>
-        row[0].toLowerCase().includes(query)
-      );
-      renderTable(filtered);
+    const headRow = document.createElement("tr");
+    header.forEach(col => {
+      const th = document.createElement("th");
+      th.textContent = col;
+      headRow.appendChild(th);
     });
-  })
-  .catch((error) => {
-    scheduleContainer.innerHTML = "<p>Error loading schedule.</p>";
-    console.error("Error:", error);
-  });
+    table.appendChild(headRow);
+
+    const dataRow = document.createElement("tr");
+    match.forEach(cell => {
+      const td = document.createElement("td");
+      td.textContent = cell;
+      dataRow.appendChild(td);
+    });
+    table.appendChild(dataRow);
+
+    container.appendChild(table);
+  } catch (err) {
+    console.error("Error:", err);
+    alert("Something went wrong while loading schedule.");
+  }
+}
