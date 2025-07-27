@@ -1,53 +1,73 @@
-const API_KEY = "AIzaSyBCn-QeQAIMCw2FbC-knJJ3zn3_SI3KDhs";
-const SHEET_ID = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
-const SHEET_NAME = "CI time";
+const apiKey = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
+const sheetId = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
+const sheetName = "CI time";
+const teacherSelect = document.getElementById("teacherSelect");
+const scheduleContainer = document.getElementById("scheduleContainer");
 
-async function getSchedule() {
-  const name = document.getElementById("nameInput").value.trim().toLowerCase();
-  const container = document.getElementById("tableContainer");
-  container.innerHTML = "";
-
-  if (!name) {
-    alert("Please enter your name.");
-    return;
-  }
-
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
+fetch(
+  `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`
+)
+  .then((res) => res.json())
+  .then((data) => {
     const rows = data.values;
-
-    const header = rows[0];
-    const match = rows.find((row, i) => i !== 0 && row[0].toLowerCase() === name);
-
-    if (!match) {
-      container.innerHTML = "<p>No schedule found for this name.</p>";
+    if (!rows || rows.length === 0) {
+      scheduleContainer.innerHTML = "<p>No data found.</p>";
       return;
     }
 
-    const table = document.createElement("table");
+    const headers = rows[0];
+    const teacherData = rows.slice(1);
+    const teachers = [...new Set(teacherData.map((row) => row[0]))];
 
-    const headRow = document.createElement("tr");
-    header.forEach(col => {
-      const th = document.createElement("th");
-      th.textContent = col;
-      headRow.appendChild(th);
+    teachers.forEach((name) => {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      teacherSelect.appendChild(option);
     });
-    table.appendChild(headRow);
 
-    const dataRow = document.createElement("tr");
-    match.forEach(cell => {
-      const td = document.createElement("td");
-      td.textContent = cell;
-      dataRow.appendChild(td);
+    teacherSelect.addEventListener("change", () => {
+      const selectedName = teacherSelect.value;
+      if (!selectedName) {
+        scheduleContainer.innerHTML = "";
+        return;
+      }
+
+      const filtered = teacherData.filter((row) => row[0] === selectedName);
+      if (filtered.length === 0) {
+        scheduleContainer.innerHTML = "<p>No schedule found for this teacher.</p>";
+        return;
+      }
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const tbody = document.createElement("tbody");
+
+      const headerRow = document.createElement("tr");
+      headers.forEach((h) => {
+        const th = document.createElement("th");
+        th.textContent = h;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+
+      filtered.forEach((row) => {
+        const tr = document.createElement("tr");
+        headers.forEach((_, i) => {
+          const td = document.createElement("td");
+          td.textContent = row[i] || "";
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(thead);
+      table.appendChild(tbody);
+      scheduleContainer.innerHTML = "";
+      scheduleContainer.appendChild(table);
     });
-    table.appendChild(dataRow);
-
-    container.appendChild(table);
-  } catch (err) {
-    console.error("Error:", err);
-    alert("Something went wrong while loading schedule.");
-  }
-}
+  })
+  .catch((error) => {
+    scheduleContainer.innerHTML = "<p>Error loading schedule.</p>";
+    console.error("Error fetching data:", error);
+  });
