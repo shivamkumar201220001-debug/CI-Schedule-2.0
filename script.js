@@ -49,10 +49,10 @@ fetch(
       });
     }
 
-    // Initial render – all teachers
+    // Initial render
     renderTable(teacherRows);
 
-    // Search functionality
+    // Filter on input
     searchInput.addEventListener("input", () => {
       const query = searchInput.value.toLowerCase().trim();
       const filtered = teacherRows.filter((row) =>
