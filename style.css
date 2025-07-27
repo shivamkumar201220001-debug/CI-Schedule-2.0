@@ -1,56 +1,31 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: White;
-  margin: 0;
-  padding: 0;
+  background: #f4f4f4;
   text-align: center;
-}
-
-.container {
-  max-width: 800px;
-  margin: auto;
   padding: 20px;
 }
 
-h1 {
+input[type="text"] {
+  padding: 10px;
+  font-size: 16px;
+  width: 300px;
+  margin-bottom: 20px;
+}
+
+.schedule-table {
+  margin: 20px auto;
+  border-collapse: collapse;
+  width: 90%;
+  max-width: 600px;
+}
+
+.schedule-table th, .schedule-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  background: #fff;
+}
+
+.schedule-table th {
   background-color: #0077cc;
   color: white;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-input {
-  padding: 10px;
-  width: 60%;
-  margin: 10px 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-button {
-  padding: 10px 20px;
-  background-color: red;
-  border: none;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: Emerald;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 10px;
-}
-
-th {
-  background-color: White;
 }
