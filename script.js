@@ -2,12 +2,15 @@ const API_KEY = "AIzaSyBCn-QeQAIMCw2FbC-knJJ3zn3_SI3KDhs";
 const SHEET_ID = "1LIXxChykzOG8cV3JN64ufIQr8iUaK9pKdvXs-6W8zfs";
 const SHEET_NAME = "CI time";
 
-let allRows = [];
-let headers = [];
-
 async function getSchedule() {
+  const name = document.getElementById("nameInput").value.trim().toLowerCase();
   const container = document.getElementById("tableContainer");
   container.innerHTML = "";
+
+  if (!name) {
+    alert("Please enter your name.");
+    return;
+  }
 
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
 
@@ -16,26 +19,18 @@ async function getSchedule() {
     const data = await res.json();
     const rows = data.values;
 
-    headers = rows[0];
-    allRows = rows.slice(1); // skip header
+    const header = rows[0];
+    const match = rows.find((row, i) => i !== 0 && row[0].toLowerCase() === name);
 
-    renderTables(allRows);
-  } catch (err) {
-    console.error("Error:", err);
-    alert("Failed to load schedule.");
-  }
-}
+    if (!match) {
+      container.innerHTML = "<p>No schedule found for this name.</p>";
+      return;
+    }
 
-function renderTables(data) {
-  const container = document.getElementById("tableContainer");
-  container.innerHTML = "";
-
-  data.forEach(row => {
     const table = document.createElement("table");
-    table.classList.add("schedule-table");
 
     const headRow = document.createElement("tr");
-    headers.forEach(col => {
+    header.forEach(col => {
       const th = document.createElement("th");
       th.textContent = col;
       headRow.appendChild(th);
@@ -43,26 +38,16 @@ function renderTables(data) {
     table.appendChild(headRow);
 
     const dataRow = document.createElement("tr");
-    row.forEach(cell => {
+    match.forEach(cell => {
       const td = document.createElement("td");
-      td.textContent = cell || "Off";
+      td.textContent = cell;
       dataRow.appendChild(td);
     });
     table.appendChild(dataRow);
 
     container.appendChild(table);
-  });
-}
-
-function filterSchedule() {
-  const query = document.getElementById("searchInput").value.trim().toLowerCase();
-  if (!query) {
-    renderTables(allRows);
-    return;
+  } catch (err) {
+    console.error("Error:", err);
+    alert("Something went wrong while loading schedule.");
   }
-
-  const filtered = allRows.filter(row => row[0].toLowerCase().includes(query));
-  renderTables(filtered);
 }
-
-window.onload = getSchedule;
